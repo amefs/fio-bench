@@ -37,13 +37,13 @@ def cleanup(filename=None):
 
 def printResult():
 	print(G+"\n测试结果:"+N)
-	table = PrettyTable(["Test Data", "读取 IOPS", "读取速度", "写入 IOPS", "写入速度"])
+	table = PrettyTable(["Test Item", "读取 IOPS", "读取速度", "写入 IOPS", "写入速度"])
 	for k,v in rwResult.items():
 		list = [k,v["read_iops"], v["read_bw"], v["write_iops"], v["write_bw"]]
 		table.add_row(list)
 	table.align = "r"
-	table.align["Test Data"] = "l"
-	print table.get_string(sortby="Test Data", reversesort=True)
+	table.align["Test Item"] = "l"
+	print table.get_string(sortby="Test Item", reversesort=True)
 
 class FioTest(object):
 	def __init__(self,name,filename,rw,bs,size,direct=1,iodepth=1,ioengine="libaio",runtime=60):

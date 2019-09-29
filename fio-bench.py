@@ -37,16 +37,16 @@ def cleanup(filename=None):
 
 def printResult():
 	print(G+"\nTest Results:"+N)
-	table = PrettyTable(["Test Data", "Read IOPS", "Read Speed", "Write IOPS", "Write Speed"])
+	table = PrettyTable(["Test Item", "Read IOPS", "Read Speed", "Write IOPS", "Write Speed"])
 	for k,v in rwResult.items():
 		list = [k,v["read_iops"], v["read_bw"], v["write_iops"], v["write_bw"]]
 		table.add_row(list)
-	table.align["Test Data"] = "l"
+	table.align["Test Item"] = "l"
 	table.align["Write IOPS"] = "r"
 	table.align["Write Speed"] = "r"
 	table.align["Read IOPS"] = "r"
 	table.align["Read Speed"] = "r"
-	print table.get_string(sortby="Test Data", reversesort=True)
+	print table.get_string(sortby="Test Item", reversesort=True)
 
 class FioTest(object):
 	def __init__(self,name,filename,rw,bs,size,direct=1,iodepth=1,ioengine="libaio",runtime=60):
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 	else:
 		test_file = "".join(args.test_file)
 
-	print(R+'Following will be test:\n'+N)
+	print(R+'Following item will be test:\n'+N)
 	if test1: print('- Seq Q32T1')
 	if test2: print('- 4K Q32T1')
 	if test3: print('- Seq')
