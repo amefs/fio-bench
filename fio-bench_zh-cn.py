@@ -23,14 +23,16 @@ def bash(cmd):
 	return shlex.os.system(cmd)
 
 def format_bytes(size):
+    size = float(size)
     power = 2**10
     n = 1
     power_labels = {0 : 'B/s', 1: 'KB/s', 2: 'MB/s', 3: 'GB/s', 4: 'TB/s'}
     while size > power:
         size /= power
         n += 1
-    out = "{} {}".format(size,power_labels[n])
-    return out
+    value = size
+    unit = "{}".format(power_labels[n])
+    return value,unit
 
 def cleanup(filename=None):
 	os.remove(filename)
@@ -109,15 +111,15 @@ class FioTest(object):
 		elif self.rw == "randread":
 			rw_iops = "read_iops"
 			rw_bw = "read_bw"
-		io_speed = format_bytes(bw)
+		io_speed, unit = format_bytes(bw)
 
 		if name in rwResult.keys():
 			rwResult[name][rw_iops] = "{:d}".format(int(iops))
-			rwResult[name][rw_bw] = io_speed
+			rwResult[name][rw_bw] = "{:.2f} {}".format(io_speed, unit) if (unit=="GB/s" or unit=="TB/s") else "{:d} {}".format(int(io_speed), unit)
 		else:
 			rwResult[name]={}
 			rwResult[name][rw_iops] = "{:d}".format(int(iops))
-			rwResult[name][rw_bw] = io_speed
+			rwResult[name][rw_bw] = "{:.2f} {}".format(io_speed, unit) if (unit=="GB/s" or unit=="TB/s") else "{:d} {}".format(int(io_speed), unit)
 
 	def saveResult(self):
 		cmd = self.exprCmd()
