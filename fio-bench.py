@@ -53,7 +53,7 @@ def printResult():
     table.align["Write Speed"] = "r"
     table.align["Read IOPS"] = "r"
     table.align["Read Speed"] = "r"
-    print table.get_string(sortby="Test Item", reversesort=True)
+    print(table.get_string(sortby="Test Item", reversesort=True))
 
 def outputResult(filename=None):
     if os.path.exists(filename):

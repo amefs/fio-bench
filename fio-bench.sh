@@ -36,7 +36,7 @@ function _error() {
 # MAIN FUNCTIONS
 ################################################################################
 function _iotest() {
-    python <(wget -qO- https://github.com/amefs/fio-bench/raw/master/fio-bench.py -o /dev/null) ${EXTRACMD}
+    python2 <(wget -qO- https://github.com/amefs/fio-bench/raw/master/fio-bench.py -o /dev/null) ${EXTRACMD}
 }
 
 function _getDistName()
@@ -82,11 +82,19 @@ function _getDistName()
 function _CentOS_Dependent()
 {
     _info "yum installing dependent packages..."
-    for packages in epel-release wget fio python python-pip;
+    for packages in epel-release wget fio python python2;
     do yum -y install $packages > /dev/null 2>&1; done
     _success "yum packages installation finished"
+    if ! $(which pip2 > /dev/null 2>&1); then
+        _info "installing python-pip"
+        cd /tmp || exit 1
+        wget -q -O get-pip.py https://bootstrap.pypa.io/get-pip.py
+        python2 get-pip.py --force-reinstall > /dev/null 2>&1
+    else
+        _success "python-pip installed"
+    fi
     _info "pip installing dependent packages..."
-    pip install prettytable > /dev/null 2>&1
+    python2 -m pip install prettytable > /dev/null 2>&1
     _success "pip packages installation finished"
 }
 
@@ -97,18 +105,33 @@ function _Deb_Dependent()
     apt-get autoremove -yqq > /dev/null 2>&1
     apt-get -fy install > /dev/null 2>&1
     export DEBIAN_FRONTEND=noninteractive
-    for packages in wget fio python python-pip;
+    for packages in wget fio;
     do apt-get install -yqq $packages > /dev/null 2>&1; done
-    _success "apt-get packages installation finished"
+    if [[ "$(dpkg -s python 2> /dev/null | grep -cow '^Status: install ok installed$')" -eq '1' ]];then
+        _success "python installed"
+    else
+        _info "installing python"
+        apt-get install -yqq python > /dev/null 2>&1
+        _success "python installed"
+    fi
+    if ! $(which pip2 > /dev/null 2>&1); then
+        _info "installing python-pip"
+        cd /tmp || exit 1
+        wget -q -O get-pip.py https://bootstrap.pypa.io/get-pip.py
+        python2 get-pip.py --force-reinstall > /dev/null 2>&1
+	   _success "python-pip installed"
+    else
+        _success "python-pip installed"
+    fi
     _info "pip installing dependent packages..."
-    pip install prettytable > /dev/null 2>&1
+    python2 -m pip install prettytable > /dev/null 2>&1
     _success "pip packages installation finished"
 }
 
 function _checkdep() {
     _getDistName
 	_info "Checking dependent packages"
-    if ( [ ! -f /usr/bin/fio ] || ! $(pip freeze --disable-pip-version-check | grep -q 'prettytable')); then
+    if ( [ ! -f /usr/bin/fio ] || ! $(which pip2 > /dev/null 2>&1) || ! $(pip freeze --disable-pip-version-check | grep -q 'prettytable' > /dev/null 2>&1)); then
         _info "Installing dependent packages..."
         if [ "$PM" = "yum" ]; then
             _CentOS_Dependent

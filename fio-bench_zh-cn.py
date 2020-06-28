@@ -49,7 +49,7 @@ def printResult():
         table.add_row(list)
     table.align = "r"
     table.align["Test Item"] = "l"
-    print table.get_string(sortby="Test Item", reversesort=True)
+    print(table.get_string(sortby="Test Item", reversesort=True))
 
 def outputResult(filename=None):
     if os.path.exists(filename):
